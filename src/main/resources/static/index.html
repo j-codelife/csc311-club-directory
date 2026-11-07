@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab – Club Directory</title>
+  <style>
+    body {
+      background: white;
+      color: black;
+      font-family: Arial, sans-serif;
+      margin: 24px;
+    }
+
+    h1 {
+      color: green;
+    }
+
+    input {
+      display: block;
+      margin-bottom: 8px;
+      padding: 4px;
+    }
+
+    #message {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Campus Club Directory</h1>
+
+  <!-- Clubs come from /api/clubs -->
+  <ul id="clubs"></ul>
+
+  <h2>Add a club</h2>
+  <form id="clubForm">
+    <input type="text" id="name" placeholder="Club name" aria-label="Club name">
+    <input type="text" id="category" placeholder="Category" aria-label="Category">
+    <input type="text" id="meetingDay" placeholder="Meeting day" aria-label="Meeting day">
+    <input type="text" id="room" placeholder="Room (optional)" aria-label="Room (optional)">
+    <button type="submit">Add club</button>
+  </form>
+  <p id="message"></p>
+
+  <script>
+async function loadClubs() {
+  const clubs = await fetch("/api/clubs").then(r => r.json());
+
+  const list = document.getElementById("clubs");
+  list.innerHTML = "";
+
+  for (const club of clubs) {
+    const li = document.createElement("li");
+
+    li.textContent = club.name + " – " + club.category + ", " + club.meetingDay
+                     + (club.room ? ", " + club.room : "");
+
+    list.appendChild(li);
+  }
+}
+
+document.getElementById("clubForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const club = {
+    name: document.getElementById("name").value,
+    category: document.getElementById("category").value,
+    meetingDay: document.getElementById("meetingDay").value,
+    room: document.getElementById("room").value
+  };
+
+  const response = await fetch("/api/clubs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(club)
+  });
+
+  if (response.ok) {
+    event.target.reset();
+    document.getElementById("message").textContent = "";
+    loadClubs();
+  } else {
+    document.getElementById("message").textContent =
+      "Please fill in name, category and meeting day.";
+  }
+});
+
+loadClubs();
+  </script>
+</body>
+</html>

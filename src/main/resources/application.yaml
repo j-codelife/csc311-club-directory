@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: clubdirectory
+  datasource:
+    url: jdbc:derby:./data/clubs-db;create=true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+
+server:
+  port: 8085
